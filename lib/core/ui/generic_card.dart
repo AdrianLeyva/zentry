@@ -14,19 +14,27 @@ class GenericCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final goldColor = color ?? const Color(0xFFCBA135);
+
     return Card(
-      color: color ?? Colors.white,
-      elevation: 2,
+      color: goldColor.withOpacity(0.9),
+      elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
       margin: const EdgeInsets.symmetric(vertical: 8),
+      shadowColor: goldColor.withOpacity(0.9),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
+        splashColor: goldColor.withOpacity(0.8),
+        highlightColor: goldColor.withOpacity(0.4),
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: child,
+          child: DefaultTextStyle(
+            style: TextStyle(color: goldColor ?? goldColor),
+            child: child,
+          ),
         ),
       ),
     );

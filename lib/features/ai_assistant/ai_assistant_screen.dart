@@ -187,10 +187,13 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                     child: TextField(
                       controller: _controller,
                       textCapitalization: TextCapitalization.sentences,
+                      style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
+                        hintStyle: TextStyle(color: Colors.grey.shade700),
                         hintText: 'Type your message...',
+                        labelStyle: TextStyle(color: Colors.black54),
                         filled: true,
-                        fillColor: theme.colorScheme.surfaceVariant,
+                        fillColor: theme.colorScheme.secondary,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
                           borderSide: BorderSide.none,

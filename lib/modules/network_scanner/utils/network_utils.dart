@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
+
 class NetworkUtils {
   static Future<String?> getLocalIp() async {
     try {
@@ -17,7 +19,7 @@ class NetworkUtils {
         }
       }
     } catch (e) {
-      print('Error obteniendo IP local: $e');
+      debugPrint('Error retrieving local IP: $e');
     }
     return null;
   }

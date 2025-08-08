@@ -1,43 +1,44 @@
 import 'package:flutter/material.dart';
 
 TextSpan parseRichText(String text, TextStyle defaultStyle) {
-  final boldPattern = RegExp(r'\*\*(.+?)\*\*');
-  final italicPattern = RegExp(r'\*(.+?)\*');
+  List<InlineSpan> spans = [];
+  int index = 0;
 
-  List<InlineSpan> children = [];
-  int currentIndex = 0;
+  final pattern = RegExp(r'(\*\*|[*])(.+?)\1');
+  final matches = pattern.allMatches(text);
 
-  Iterable<RegExpMatch> allMatches = [
-    ...boldPattern.allMatches(text),
-    ...italicPattern.allMatches(text),
-  ].toList()
-    ..sort((a, b) => a.start.compareTo(b.start));
-
-  for (final match in allMatches) {
-    if (match.start > currentIndex) {
-      children.add(TextSpan(
-          text: text.substring(currentIndex, match.start),
-          style: defaultStyle));
+  for (final match in matches) {
+    if (match.start > index) {
+      spans.add(TextSpan(
+        text: text.substring(index, match.start),
+        style: defaultStyle,
+      ));
     }
-    final matchedText = match.group(1)!;
-    if (match.pattern == boldPattern) {
-      children.add(TextSpan(
-          text: matchedText,
-          style: defaultStyle
-              .merge(const TextStyle(fontWeight: FontWeight.bold))));
-    } else if (match.pattern == italicPattern) {
-      children.add(TextSpan(
-          text: matchedText,
-          style: defaultStyle
-              .merge(const TextStyle(fontStyle: FontStyle.italic))));
+
+    final marker = match.group(1);
+    final content = match.group(2)!;
+
+    if (marker == '**') {
+      spans.add(TextSpan(
+        text: content,
+        style: defaultStyle.merge(const TextStyle(fontWeight: FontWeight.bold)),
+      ));
+    } else if (marker == '*') {
+      spans.add(TextSpan(
+        text: content,
+        style: defaultStyle.merge(const TextStyle(fontStyle: FontStyle.italic)),
+      ));
     }
-    currentIndex = match.end;
+
+    index = match.end;
   }
 
-  if (currentIndex < text.length) {
-    children
-        .add(TextSpan(text: text.substring(currentIndex), style: defaultStyle));
+  if (index < text.length) {
+    spans.add(TextSpan(
+      text: text.substring(index),
+      style: defaultStyle,
+    ));
   }
 
-  return TextSpan(children: children, style: defaultStyle);
+  return TextSpan(children: spans, style: defaultStyle);
 }
