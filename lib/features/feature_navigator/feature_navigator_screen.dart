@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zentry/components/feature_card.dart';
 import 'package:zentry/components/feature_item.dart';
+import 'package:zentry/features/ai_assistant/ai_assistant_screen.dart';
 import 'package:zentry/features/network_scanner/network_scanner_screen.dart';
 import 'package:zentry/features/packet_sniffer/packet_sniffer_screen.dart';
 
@@ -22,6 +23,12 @@ class FeatureNavigatorScreen extends StatelessWidget {
         description: "Monitor incoming and outgoing packets (Android only).",
         icon: Icons.shield,
         screenBuilder: () => PacketSnifferScreen(),
+      ),
+      FeatureItem(
+        title: "AI Assistant",
+        description: "Chat and interact with an AI assistant in real time.",
+        icon: Icons.smart_toy,
+        screenBuilder: () => const AiAssistantScreen(),
       ),
     ];
 
