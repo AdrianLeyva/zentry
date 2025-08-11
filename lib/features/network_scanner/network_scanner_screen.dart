@@ -6,6 +6,12 @@ import 'package:zentry/components/scanner_result_card.dart';
 import 'package:zentry/components/vulnerability_result_card.dart';
 import 'package:zentry/core/ui/generic_loader.dart';
 import 'package:zentry/core/ui/generic_scaffold.dart';
+import 'package:zentry/core/ui/generic_text_dialog.dart';
+import 'package:zentry/modules/ai/providers/ai_provider_factory.dart';
+import 'package:zentry/modules/ai/services/ai_service.dart';
+import 'package:zentry/modules/ai/services/ai_service_factory.dart';
+import 'package:zentry/modules/network_scanner/extensions/host_extensions.dart';
+import 'package:zentry/modules/network_scanner/extensions/vulnerability_extensions.dart';
 import 'package:zentry/modules/network_scanner/models/host.dart';
 import 'package:zentry/modules/network_scanner/models/vulnerability.dart';
 import 'package:zentry/modules/network_scanner/services/network_scan_service.dart';
@@ -19,9 +25,19 @@ class NetworkScannerScreen extends StatefulWidget {
 
 class _NetworkScannerScreenState extends State<NetworkScannerScreen> {
   final _scanner = NetworkScanService();
+  late final AIService _aiService;
   List<Host> hosts = [];
   List<Vulnerability> vulnerabilities = [];
   bool isScanning = false;
+  bool isAnalyzingScannerResultsWithAi = false;
+  bool hasScanned = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _aiService = AiServiceFactory.networkSecurityAiService(
+        AiProviderFactory.createGeminiProvider());
+  }
 
   void _startScan() async {
     setState(() {
@@ -37,7 +53,38 @@ class _NetworkScannerScreenState extends State<NetworkScannerScreen> {
       hosts = scannedHosts;
       vulnerabilities = vulns;
       isScanning = false;
+      hasScanned = true;
     });
+  }
+
+  void _analyzeScannerResultsWithAi() async {
+    setState(() {
+      isAnalyzingScannerResultsWithAi = true;
+    });
+
+    final analysisPrompt = '''
+Please analyze the discovered hosts and vulnerabilities. Provide a very concise and focused summary of the findings. Be direct and to the point in your analysis, clearly identifying the vulnerabilities found, associated risks, and recommended mitigation measures. Avoid unnecessary details.
+
+${hosts.toSummaryString()}
+${vulnerabilities.toSummaryString()}
+''';
+    final aiResponse = await _aiService.processPrompt(analysisPrompt);
+
+    setState(() {
+      isAnalyzingScannerResultsWithAi = false;
+    });
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (_) => GenericTextDialog(
+        title: 'AI Analysis Result',
+        mainText: aiResponse.text,
+        jsonData: aiResponse.metadata,
+        closeButtonText: 'Close',
+      ),
+    );
   }
 
   Future<List<Host>> computeFullScan() async {
@@ -62,14 +109,29 @@ class _NetworkScannerScreenState extends State<NetworkScannerScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (!isScanning)
+                if (!isScanning && !isAnalyzingScannerResultsWithAi)
                   ElevatedButton(
                     onPressed: isScanning ? null : _startScan,
                     child: Text(isScanning ? "Scanning..." : "Start Scan"),
                   ),
+                if (!isScanning &&
+                    !isAnalyzingScannerResultsWithAi &&
+                    (hosts.isNotEmpty || vulnerabilities.isNotEmpty))
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: ElevatedButton(
+                      onPressed: _analyzeScannerResultsWithAi,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                      ),
+                      child: const Text("Analyze with AI"),
+                    ),
+                  ),
                 const SizedBox(height: 24),
                 if (!isScanning && hosts.isEmpty) const Text("No hosts found."),
-                if (hosts.isNotEmpty)
+                if (hosts.isNotEmpty &&
+                    !isAnalyzingScannerResultsWithAi &&
+                    hasScanned)
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -117,6 +179,16 @@ class _NetworkScannerScreenState extends State<NetworkScannerScreen> {
                 ),
               ),
             ),
+          if (isAnalyzingScannerResultsWithAi)
+            Positioned.fill(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                child: const GenericLoader(
+                  size: 180,
+                  loadingText: 'ANALYZING WITH AI...',
+                ),
+              ),
+            )
         ],
       ),
     );
