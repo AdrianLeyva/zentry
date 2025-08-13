@@ -1,60 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zentry/core/ui/generic_scaffold.dart';
 import 'package:zentry/core/ui/utils.dart';
 import 'package:zentry/features/ai_assistant/models/ai_message_ui.dart';
-import 'package:zentry/modules/ai/providers/ai_provider_factory.dart';
-import 'package:zentry/modules/ai/services/ai_service.dart';
-import 'package:zentry/modules/ai/services/ai_service_factory.dart';
 
-class AiAssistantScreen extends StatefulWidget {
-  const AiAssistantScreen({super.key});
+import 'bloc/ai_assistant_bloc.dart';
+import 'bloc/ai_assistant_event.dart';
+import 'bloc/ai_assistant_state.dart';
 
-  @override
-  State<AiAssistantScreen> createState() => _AiAssistantScreenState();
-}
+class AiAssistantScreen extends StatelessWidget {
+  AiAssistantScreen({super.key});
 
-class _AiAssistantScreenState extends State<AiAssistantScreen> {
-  final List<AIMessageUI> _messages = [];
   final TextEditingController _controller = TextEditingController();
-  late final AIService _aiService;
-  bool _isLoading = false;
   final ScrollController _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _aiService = AiServiceFactory.networkSecurityAiService(
-        AiProviderFactory.createGeminiProvider());
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _sendMessage() async {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
-
-    setState(() {
-      _messages.insert(0, AIMessageUI(role: 'user', content: text));
-      _isLoading = true;
-    });
-    _controller.clear();
-
-    _scrollToTop();
-
-    final aiResponse = await _aiService.processPrompt(text);
-
-    setState(() {
-      _messages.insert(0, AIMessageUI(role: 'ai', content: aiResponse.text));
-      _isLoading = false;
-    });
-
-    _scrollToTop();
-  }
 
   void _scrollToTop() {
     if (_scrollController.hasClients) {
@@ -66,7 +24,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     }
   }
 
-  Widget _buildMessage(AIMessageUI message, bool isLast) {
+  Widget _buildMessage(BuildContext context, AIMessageUI message, bool isLast) {
     final theme = Theme.of(context);
     final isUser = message.role == 'user';
 
@@ -142,8 +100,6 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
               thickness: 0.5,
               color: theme.colorScheme.onBackground
                   .withAlpha((0.15 * 255).round()),
-              indent: 0,
-              endIndent: 0,
             ),
           ),
       ],
@@ -154,68 +110,89 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return GenericScaffold(
-      title: 'AI Assistant',
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              reverse: true,
-              padding: const EdgeInsets.only(top: 12),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) => _buildMessage(
-                  _messages[index], index == _messages.length - 1),
-            ),
-          ),
-          if (_isLoading)
-            LinearProgressIndicator(
-              color: theme.colorScheme.primary,
-              minHeight: 3,
-            ),
-          SafeArea(
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      textCapitalization: TextCapitalization.sentences,
-                      style: const TextStyle(color: Colors.black),
-                      decoration: InputDecoration(
-                        hintStyle: TextStyle(color: Colors.grey.shade700),
-                        hintText: 'Type your message...',
-                        labelStyle: TextStyle(color: Colors.black54),
-                        filled: true,
-                        fillColor: theme.colorScheme.secondary,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 20),
-                      ),
-                      onSubmitted: (_) => _sendMessage(),
-                    ),
+    return BlocProvider(
+      create: (_) => AiAssistantBloc(),
+      child: BlocBuilder<AiAssistantBloc, AiAssistantState>(
+        builder: (context, state) {
+          return GenericScaffold(
+            title: 'AI Assistant',
+            body: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    reverse: true,
+                    padding: const EdgeInsets.only(top: 12),
+                    itemCount: state.messages.length,
+                    itemBuilder: (context, index) => _buildMessage(
+                        context,
+                        state.messages[index],
+                        index == state.messages.length - 1),
                   ),
-                  const SizedBox(width: 8),
-                  Material(
+                ),
+                if (state.isLoading)
+                  LinearProgressIndicator(
                     color: theme.colorScheme.primary,
-                    shape: const CircleBorder(),
-                    child: IconButton(
-                      icon: const Icon(Icons.send),
-                      color: theme.colorScheme.onPrimary,
-                      onPressed: _sendMessage,
-                      tooltip: 'Send message',
+                    minHeight: 3,
+                  ),
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 12.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _controller,
+                            textCapitalization: TextCapitalization.sentences,
+                            style: const TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                              hintStyle: TextStyle(color: Colors.grey.shade700),
+                              hintText: 'Type your message...',
+                              labelStyle: TextStyle(color: Colors.black54),
+                              filled: true,
+                              fillColor: theme.colorScheme.secondary,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(24),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 12, horizontal: 20),
+                            ),
+                            onSubmitted: (_) {
+                              context
+                                  .read<AiAssistantBloc>()
+                                  .add(SendMessageEvent(_controller.text));
+                              _controller.clear();
+                              _scrollToTop();
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Material(
+                          color: theme.colorScheme.primary,
+                          shape: const CircleBorder(),
+                          child: IconButton(
+                            icon: const Icon(Icons.send),
+                            color: theme.colorScheme.onPrimary,
+                            onPressed: () {
+                              context
+                                  .read<AiAssistantBloc>()
+                                  .add(SendMessageEvent(_controller.text));
+                              _controller.clear();
+                              _scrollToTop();
+                            },
+                            tooltip: 'Send message',
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
