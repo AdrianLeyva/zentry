@@ -2,21 +2,21 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class GenericLoader extends StatefulWidget {
+class ZentryLoader extends StatefulWidget {
   final double size;
   final String loadingText;
 
-  const GenericLoader({
+  const ZentryLoader({
     super.key,
     this.size = 150,
     this.loadingText = 'SCANNING...',
   });
 
   @override
-  State<GenericLoader> createState() => _GenericLoaderState();
+  State<ZentryLoader> createState() => _ZentryLoaderState();
 }
 
-class _GenericLoaderState extends State<GenericLoader>
+class _ZentryLoaderState extends State<ZentryLoader>
     with TickerProviderStateMixin {
   late AnimationController _rotationController;
   late AnimationController _glowController;
@@ -136,7 +136,7 @@ class _CyberSecurityPainter extends CustomPainter {
         colors: [
           Color.lerp(
               const Color(0xFFFFD700), const Color(0xFFFFA500), glowValue)!,
-          Colors.orangeAccent.withOpacity(0.7 * glowValue),
+          Colors.orangeAccent.withValues(alpha: 0.7 * glowValue),
           Colors.transparent,
         ],
         stops: const [0.0, 0.6, 1.0],
@@ -148,8 +148,8 @@ class _CyberSecurityPainter extends CustomPainter {
     final ringPaint = Paint()
       ..shader = RadialGradient(
         colors: [
-          Colors.white.withOpacity(0.8 * glowValue),
-          Colors.orange.withOpacity(0),
+          Colors.white.withValues(alpha: 0.8 * glowValue),
+          Colors.orange.withValues(alpha: 0.0),
         ],
         stops: const [0.0, 1.0],
       ).createShader(Rect.fromCircle(center: center, radius: maxRadius * 0.8))
@@ -160,7 +160,7 @@ class _CyberSecurityPainter extends CustomPainter {
     canvas.drawCircle(center, maxRadius * 0.8, ringPaint);
 
     final coreCenterPaint = Paint()
-      ..color = Colors.white.withOpacity(0.9)
+      ..color = Colors.white.withValues(alpha: 0.9)
       ..maskFilter = MaskFilter.blur(BlurStyle.normal, 8 * glowValue);
 
     canvas.drawCircle(center, maxRadius * 0.25, coreCenterPaint);

@@ -4,14 +4,13 @@ import 'dart:isolate';
 import 'package:flutter/material.dart';
 import 'package:zentry/components/scanner_result_card.dart';
 import 'package:zentry/components/vulnerability_result_card.dart';
-import 'package:zentry/core/ui/generic_loader.dart';
+import 'package:zentry/components/zentry_loader.dart';
 import 'package:zentry/core/ui/generic_scaffold.dart';
 import 'package:zentry/core/ui/generic_text_dialog.dart';
+import 'package:zentry/features/network_scanner/network_scanner_prompt_provider.dart';
 import 'package:zentry/modules/ai/providers/ai_provider_factory.dart';
 import 'package:zentry/modules/ai/services/ai_service.dart';
 import 'package:zentry/modules/ai/services/ai_service_factory.dart';
-import 'package:zentry/modules/network_scanner/extensions/host_extensions.dart';
-import 'package:zentry/modules/network_scanner/extensions/vulnerability_extensions.dart';
 import 'package:zentry/modules/network_scanner/models/host.dart';
 import 'package:zentry/modules/network_scanner/models/vulnerability.dart';
 import 'package:zentry/modules/network_scanner/services/network_scan_service.dart';
@@ -23,7 +22,8 @@ class NetworkScannerScreen extends StatefulWidget {
   State<NetworkScannerScreen> createState() => _NetworkScannerScreenState();
 }
 
-class _NetworkScannerScreenState extends State<NetworkScannerScreen> {
+class _NetworkScannerScreenState extends State<NetworkScannerScreen>
+    with SingleTickerProviderStateMixin {
   final _scanner = NetworkScanService();
   late final AIService _aiService;
   List<Host> hosts = [];
@@ -32,11 +32,29 @@ class _NetworkScannerScreenState extends State<NetworkScannerScreen> {
   bool isAnalyzingScannerResultsWithAi = false;
   bool hasScanned = false;
 
+  late AnimationController _shadowController;
+  late Animation<double> _shadowAnimation;
+
   @override
   void initState() {
     super.initState();
     _aiService = AiServiceFactory.networkSecurityAiService(
         AiProviderFactory.createGeminiProvider());
+
+    _shadowController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+
+    _shadowAnimation = Tween<double>(begin: 4, end: 14).animate(
+      CurvedAnimation(parent: _shadowController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _shadowController.dispose();
+    super.dispose();
   }
 
   void _startScan() async {
@@ -62,12 +80,8 @@ class _NetworkScannerScreenState extends State<NetworkScannerScreen> {
       isAnalyzingScannerResultsWithAi = true;
     });
 
-    final analysisPrompt = '''
-Please analyze the discovered hosts and vulnerabilities. Provide a very concise and focused summary of the findings. Be direct and to the point in your analysis, clearly identifying the vulnerabilities found, associated risks, and recommended mitigation measures. Avoid unnecessary details.
-
-${hosts.toSummaryString()}
-${vulnerabilities.toSummaryString()}
-''';
+    final analysisPrompt = NetworkScannerPromptProvider.buildAnalysisPrompt(
+        hosts, vulnerabilities);
     final aiResponse = await _aiService.processPrompt(analysisPrompt);
 
     setState(() {
@@ -110,21 +124,51 @@ ${vulnerabilities.toSummaryString()}
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (!isScanning && !isAnalyzingScannerResultsWithAi)
-                  ElevatedButton(
-                    onPressed: isScanning ? null : _startScan,
-                    child: Text(isScanning ? "Scanning..." : "Start Scan"),
-                  ),
-                if (!isScanning &&
-                    !isAnalyzingScannerResultsWithAi &&
-                    (hosts.isNotEmpty || vulnerabilities.isNotEmpty))
                   Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: ElevatedButton(
-                      onPressed: _analyzeScannerResultsWithAi,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                      ),
-                      child: const Text("Analyze with AI"),
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: isScanning ? null : _startScan,
+                            icon: const Icon(Icons.wifi_tethering,
+                                size: 20, color: Colors.black87),
+                            label:
+                                Text(isScanning ? "Scanning..." : "Start Scan"),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              textStyle: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        if (hosts.isNotEmpty || vulnerabilities.isNotEmpty)
+                          Expanded(
+                            child: AnimatedBuilder(
+                              animation: _shadowAnimation,
+                              builder: (context, child) {
+                                return ElevatedButton.icon(
+                                  onPressed: _analyzeScannerResultsWithAi,
+                                  icon: const Icon(Icons.smart_toy,
+                                      size: 20, color: Colors.black87),
+                                  label: const Text("Analyze with AI"),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    shadowColor: Colors.yellow.withAlpha(204),
+                                    elevation: _shadowAnimation.value,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
+                                    textStyle: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 const SizedBox(height: 24),
@@ -173,7 +217,7 @@ ${vulnerabilities.toSummaryString()}
             Positioned.fill(
               child: Container(
                 padding: const EdgeInsets.all(16),
-                child: const GenericLoader(
+                child: const ZentryLoader(
                   size: 180,
                   loadingText: 'SCANNING...',
                 ),
@@ -183,12 +227,12 @@ ${vulnerabilities.toSummaryString()}
             Positioned.fill(
               child: Container(
                 padding: const EdgeInsets.all(16),
-                child: const GenericLoader(
+                child: const ZentryLoader(
                   size: 180,
                   loadingText: 'ANALYZING WITH AI...',
                 ),
               ),
-            )
+            ),
         ],
       ),
     );

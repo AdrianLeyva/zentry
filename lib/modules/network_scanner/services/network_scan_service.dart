@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:zentry/modules/logger/logger.dart';
 import 'package:zentry/modules/network_scanner/models/host.dart';
 import 'package:zentry/modules/network_scanner/models/vulnerability.dart';
 import 'package:zentry/modules/network_scanner/scanners/network_scanner.dart';
@@ -18,13 +18,13 @@ class NetworkScanService {
   Future<List<Host>> fullScan() async {
     final localIp = await NetworkUtils.getLocalIp();
     if (localIp == null) {
-      debugPrint('Could not obtain local IP');
+      Logger.debug("Could not obtain local IP");
       return [];
     }
 
     final subnet = NetworkUtils.getSubnet(localIp);
     if (subnet == null) {
-      debugPrint('Could not determine subnet for $localIp');
+      Logger.debug("Could not determine subnet for $localIp");
       return [];
     }
 

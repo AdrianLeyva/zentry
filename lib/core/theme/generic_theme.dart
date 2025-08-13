@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   static const _gold = Color(0xFFCBA135);
-  static const _softBlack = Color(0xFF1A1A1A); // negro suave
+  static const _softBlack = Color(0xFF1A1A1A);
   static const _platinum = Color(0xFFE2E2DF);
   static const _grayText = Color(0xFFB0B0AA);
 
@@ -15,8 +15,6 @@ class AppTheme {
       onPrimary: _softBlack,
       secondary: _platinum,
       onSecondary: _softBlack,
-      background: _softBlack,
-      onBackground: _platinum,
       surface: _softBlack,
       onSurface: _platinum,
       error: Colors.red.shade700,
@@ -40,7 +38,7 @@ class AppTheme {
       bodyMedium: TextStyle(fontSize: 14, color: _grayText),
     ),
     cardTheme: CardTheme(
-      color: _softBlack.withOpacity(0.85),
+      color: _softBlack.withAlpha((0.85 * 255).round()),
       elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
     ),
@@ -57,6 +55,6 @@ class AppTheme {
       backgroundColor: _gold,
       foregroundColor: _softBlack,
     ),
-    dividerColor: _platinum.withOpacity(0.3),
+    dividerColor: _platinum.withAlpha((0.3 * 255).round()),
   );
 }

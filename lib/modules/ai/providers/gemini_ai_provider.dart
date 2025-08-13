@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:zentry/modules/ai/models/ai_bool_request.dart';
 import 'package:zentry/modules/ai/models/ai_bool_response.dart';
 import 'package:zentry/modules/ai/models/ai_request.dart';
 import 'package:zentry/modules/ai/models/ai_response.dart';
+import 'package:zentry/modules/logger/logger.dart';
 
 import 'ai_provider.dart';
 
@@ -21,9 +21,8 @@ class GeminiAiProvider implements AIProvider {
 
   @override
   Future<AIResponse> send(AIRequest request) async {
-    debugPrint(
+    Logger.debug(
         "[GeminiProvider] Sending text request to Gemini with prompt: ${request.prompt}");
-
     final url = Uri.parse('$baseUrl?key=$apiKey');
 
     final body = {
@@ -39,14 +38,16 @@ class GeminiAiProvider implements AIProvider {
     final response = await http.post(
       url,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: jsonEncode(body),
     );
 
     if (response.statusCode != 200) {
-      throw Exception(
-          "[GeminiProvider] Request failed with status: ${response.statusCode}, body: ${response.body}");
+      final errorMessage =
+          "[GeminiProvider] Request failed with status: ${response.statusCode}, body: ${response.body}";
+      Logger.error(errorMessage);
+      throw Exception(errorMessage);
     }
 
     final decoded = jsonDecode(response.body);
@@ -58,7 +59,7 @@ class GeminiAiProvider implements AIProvider {
 
   @override
   Future<AIBoolResponse> evaluate(AIBoolRequest request) async {
-    debugPrint(
+    Logger.debug(
         "[GeminiProvider] Sending boolean evaluation request to Gemini...");
 
     final formattedPrompt = """
@@ -70,7 +71,7 @@ reasoning: "Explain in detail why TRUE or FALSE."
 Prompt: ${request.prompt}
 """;
 
-    debugPrint("[GeminiProvider] Formatted boolean prompt: $formattedPrompt");
+    Logger.debug("[GeminiProvider] Formatted boolean prompt: $formattedPrompt");
 
     final url = Uri.parse('$baseUrl?key=$apiKey');
 
@@ -102,7 +103,7 @@ Prompt: ${request.prompt}
             ?['text'] ??
         "response: FALSE, reasoning: \"No reasoning provided.\"";
 
-    debugPrint("[GeminiProvider] Raw AI response: $rawText");
+    Logger.debug("[GeminiProvider] Raw AI response: $rawText");
 
     return _parseBooleanResponse(rawText);
   }

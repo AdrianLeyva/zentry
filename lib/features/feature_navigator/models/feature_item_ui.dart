@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 
-class FeatureItem {
+class FeatureItemUi {
   final String title;
   final String description;
   final IconData icon;
   final Widget Function() screenBuilder;
 
-  FeatureItem({
+  FeatureItemUi({
     required this.title,
     required this.description,
     required this.icon,

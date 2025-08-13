@@ -12,8 +12,9 @@ extension HostExtensions on List<Host> {
       if (host.macAddress != null) buffer.writeln('  MAC: ${host.macAddress}');
       if (host.vendor != null) buffer.writeln('  Vendor: ${host.vendor}');
       buffer.writeln('  Reachable: ${host.isReachable}');
-      if (host.latencyMs != null)
+      if (host.latencyMs != null) {
         buffer.writeln('  Latency: ${host.latencyMs} ms');
+      }
       if (host.openPorts.isNotEmpty) {
         final ports = host.openPorts.map((p) => p.port).join(', ');
         buffer.writeln('  Open ports: $ports');

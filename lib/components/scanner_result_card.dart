@@ -44,6 +44,7 @@ class ScannerResultCard extends StatelessWidget {
         host.isReachable ? Colors.green[900] : Colors.red[900];
 
     return GenericCard(
+      color: Colors.grey.shade50,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -96,7 +97,7 @@ class ScannerResultCard extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(

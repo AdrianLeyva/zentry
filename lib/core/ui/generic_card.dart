@@ -17,22 +17,22 @@ class GenericCard extends StatelessWidget {
     final goldColor = color ?? const Color(0xFFCBA135);
 
     return Card(
-      color: goldColor.withOpacity(0.9),
+      color: goldColor.withValues(alpha: 0.9),
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
       margin: const EdgeInsets.symmetric(vertical: 8),
-      shadowColor: goldColor.withOpacity(0.9),
+      shadowColor: goldColor.withValues(alpha: 0.9),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        splashColor: goldColor.withOpacity(0.8),
-        highlightColor: goldColor.withOpacity(0.4),
+        splashColor: goldColor.withValues(alpha: 0.8),
+        highlightColor: goldColor.withValues(alpha: 0.4),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: DefaultTextStyle(
-            style: TextStyle(color: goldColor ?? goldColor),
+            style: TextStyle(color: goldColor),
             child: child,
           ),
         ),

@@ -66,7 +66,7 @@ class _ZentryPainter extends CustomPainter {
         colors: [
           Color.lerp(
               const Color(0xFFFFD700), const Color(0xFFFFA500), glowValue)!,
-          Colors.orangeAccent.withOpacity(0.7 * glowValue),
+          Colors.orangeAccent.withValues(alpha: 0.7 * glowValue),
           Colors.transparent,
         ],
         stops: [0.0, 0.6, 1.0],
@@ -78,8 +78,8 @@ class _ZentryPainter extends CustomPainter {
     final ringPaint = Paint()
       ..shader = RadialGradient(
         colors: [
-          Colors.white.withOpacity(0.8 * glowValue),
-          Colors.orange.withOpacity(0.0),
+          Colors.white.withValues(alpha: 0.8 * glowValue),
+          Colors.orange.withValues(alpha: 0.0),
         ],
         stops: [0.0, 1.0],
       ).createShader(Rect.fromCircle(center: center, radius: maxRadius * 0.8))
@@ -90,7 +90,7 @@ class _ZentryPainter extends CustomPainter {
     canvas.drawCircle(center, maxRadius * 0.8, ringPaint);
 
     final coreCenterPaint = Paint()
-      ..color = Colors.white.withOpacity(0.9)
+      ..color = Colors.white.withValues(alpha: 0.9)
       ..maskFilter = MaskFilter.blur(BlurStyle.normal, 8 * glowValue);
 
     canvas.drawCircle(center, maxRadius * 0.25, coreCenterPaint);
@@ -102,7 +102,7 @@ class _ZentryPainter extends CustomPainter {
       color: const Color(0xFF282614),
       shadows: [
         Shadow(
-          color: Colors.amber.withOpacity(0.9),
+          color: Colors.amber.withValues(alpha: 0.9),
           blurRadius: 12,
           offset: Offset(0, 0),
         ),

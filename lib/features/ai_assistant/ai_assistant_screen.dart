@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:zentry/core/ui/generic_scaffold.dart';
 import 'package:zentry/core/ui/utils.dart';
+import 'package:zentry/features/ai_assistant/models/ai_message_ui.dart';
 import 'package:zentry/modules/ai/providers/ai_provider_factory.dart';
 import 'package:zentry/modules/ai/services/ai_service.dart';
 import 'package:zentry/modules/ai/services/ai_service_factory.dart';
-
-class AIMessageUI {
-  final String role;
-  final String content;
-
-  AIMessageUI({required this.role, required this.content});
-}
 
 class AiAssistantScreen extends StatefulWidget {
   const AiAssistantScreen({super.key});
@@ -76,8 +70,9 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     final theme = Theme.of(context);
     final isUser = message.role == 'user';
 
-    final bgColor =
-        isUser ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant;
+    final bgColor = isUser
+        ? theme.colorScheme.primary
+        : theme.colorScheme.surfaceContainerHighest;
 
     final textColor = isUser
         ? theme.colorScheme.onPrimary
@@ -107,7 +102,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             isUser ? 'You' : 'AI Assistant',
             style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onBackground.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withAlpha((0.6 * 255).round()),
             ),
           ),
         ),
@@ -124,7 +119,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
               borderRadius: radius,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withAlpha((0.1 * 255).round()),
                   blurRadius: 4,
                   offset: const Offset(2, 2),
                 ),
@@ -145,7 +140,8 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             ),
             child: Divider(
               thickness: 0.5,
-              color: theme.colorScheme.onBackground.withOpacity(0.15),
+              color: theme.colorScheme.onBackground
+                  .withAlpha((0.15 * 255).round()),
               indent: 0,
               endIndent: 0,
             ),
