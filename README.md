@@ -1,39 +1,36 @@
 # Zentry 🛡️
 **AI-Powered Local Network Scanner – Flutter App**
 
-Zentry es una innovadora aplicación móvil y de escritorio enfocada en ciberseguridad, desarrollada con Flutter. Permite a los usuarios escanear y evaluar sus redes locales con análisis inteligentes potenciados por IA.
+Zentry is an innovative mobile and desktop application focused on cybersecurity, developed with Flutter. It allows users to scan and evaluate their local networks with AI-powered intelligent analysis.
 
 ## 🚀 Features
 
-- 🔍 **Escaneo de Red Local**  
-  Detecta todos los dispositivos conectados y puertos abiertos en la red local.
+- 🔍 **Local Network Scanning**  
+  Detects all connected devices and open ports in the local network.
 
-- 🧠 **Evaluación con IA**  
-  Utiliza inteligencia artificial para analizar la estructura de la red, detectar vulnerabilidades y ofrecer sugerencias de mejora.
+- 🧠 **AI Evaluation**  
+  Uses artificial intelligence to analyze network structure, detect vulnerabilities, and provide improvement suggestions.
 
-- 📊 **Reportes Interactivos**  
-  Presenta resúmenes claros y accionables sobre la salud de la red.
+- 🛰️ **Packet Sniffing**  
+  Captures and analyzes network packets to give deeper insights into network traffic.
 
-- 💡 **Recomendaciones en Tiempo Real**  
-  Zentry no solo escanea: también educa y aconseja cómo asegurar redes domésticas y de oficina.
-
-- 🌐 **Multiplataforma con Flutter**  
-  Desarrollado con Flutter para una experiencia fluida en Android, iOS y escritorio.
+- 🌐 **Flutter Multiplatform**  
+  Developed with Flutter for a seamless experience on Android, iOS, and desktop.
 
 ## 🛠️ Tech Stack
 
-- [Flutter](https://flutter.dev/) (UI multiplataforma)
-- Dart (lenguaje principal)
-- Platform Channels para integración nativa (Android/iOS)
-- Streams y State Management para datos en tiempo real
-- Librerías propias para escaneo de red y análisis
-- Integración con AI externa para evaluación y recomendaciones
+- [Flutter](https://flutter.dev/) (Multiplatform UI)
+- Dart (Primary language)
+- Platform Channels for native integration (Android/iOS)
+- BLoC for state management
+- Custom libraries for network scanning and analysis
+- Integration with external AI for evaluation and recommendations
 
-## 📦 Instalación
+## 📦 Installation
 
-Actualmente Zentry está en desarrollo activo. Próximamente se liberará una beta pública.
+Zentry is currently under active development. A public beta will be released soon.
 
-Para construir localmente:
+To build locally:
 
 ```bash
 git clone https://github.com/yourusername/zentry.git
