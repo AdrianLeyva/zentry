@@ -23,8 +23,6 @@ class GeminiAiProvider implements AIProvider {
   Future<AIResponse> send(AIRequest request) async {
     Logger.debug(
         "[GeminiProvider] Sending text request to Gemini with prompt: ${request.prompt}");
-    final url = Uri.parse('$baseUrl?key=$apiKey');
-
     final body = {
       "contents": [
         {
@@ -36,9 +34,10 @@ class GeminiAiProvider implements AIProvider {
     };
 
     final response = await http.post(
-      url,
+      Uri.parse(baseUrl),
       headers: {
         "Content-Type": "application/json",
+        "X-goog-api-key": apiKey,
       },
       body: jsonEncode(body),
     );

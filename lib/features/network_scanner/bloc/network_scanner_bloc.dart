@@ -44,8 +44,9 @@ class NetworkScannerBloc
       AnalyzeWithAiEvent event, Emitter<NetworkScannerState> emit) async {
     emit(state.copyWith(isAnalyzingWithAi: true));
 
-    final prompt = NetworkScannerPromptProvider.buildAnalysisPrompt(
-        state.hosts, state.vulnerabilities);
+    final prompt =
+        NetworkScannerPromptProvider.buildAnalysisNetworkScannerPrompt(
+            state.hosts, state.vulnerabilities);
     final aiResponse = await _aiService.processPrompt(prompt);
 
     emit(state.copyWith(

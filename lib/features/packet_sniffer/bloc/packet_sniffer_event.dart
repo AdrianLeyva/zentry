@@ -18,3 +18,5 @@ class PacketCapturedEvent extends PacketSnifferEvent {
   @override
   List<Object?> get props => [packet];
 }
+
+class AnalyzeWithAiEvent extends PacketSnifferEvent {}

@@ -81,38 +81,37 @@ class NetworkScannerScreen extends StatelessWidget {
                           !state.isAnalyzingWithAi &&
                           state.hasScanned)
                         Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: ListView(
-                              children: [
-                                Text(
-                                  "🖥️ Discovered Hosts (${state.hosts.length}):",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                    color: Colors.white,
-                                  ),
+                          child: ListView(
+                            children: [
+                              Text(
+                                "🖥️ Discovered Hosts (${state.hosts.length}):",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Colors.white,
                                 ),
-                                ...state.hosts.map(
-                                    (host) => ScannerResultCard(host: host)),
-                                const SizedBox(height: 16),
-                                Text(
-                                  "🛡️ Detected Vulnerabilities (${state.vulnerabilities.length}):",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                    color: Colors.white,
-                                  ),
+                              ),
+                              const SizedBox(height: 8),
+                              ...state.hosts
+                                  .map((host) => ScannerResultCard(host: host)),
+                              const SizedBox(height: 16),
+                              Text(
+                                "🛡️ Detected Vulnerabilities (${state.vulnerabilities.length}):",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Colors.white,
                                 ),
-                                if (state.vulnerabilities.isEmpty)
-                                  const Text(
-                                      "No critical vulnerabilities found."),
-                                ...state.vulnerabilities.map(
-                                  (v) =>
-                                      VulnerabilityResultCard(vulnerability: v),
-                                ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(height: 8),
+                              if (state.vulnerabilities.isEmpty)
+                                const Text(
+                                    "No critical vulnerabilities found."),
+                              ...state.vulnerabilities.map(
+                                (v) =>
+                                    VulnerabilityResultCard(vulnerability: v),
+                              ),
+                            ],
                           ),
                         ),
                     ],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:zentry/core/ui/generic_card.dart';
 import 'package:zentry/modules/network_scanner/models/host.dart';
 
 class ScannerResultCard extends StatelessWidget {
@@ -19,14 +18,14 @@ class ScannerResultCard extends StatelessWidget {
         text: '$label: ',
         style: theme.textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w600,
-          color: Colors.black87,
+          color: Colors.grey,
         ),
         children: [
           TextSpan(
             text: value,
             style: theme.textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.w500,
-              color: valueColor ?? Colors.black87,
+              color: valueColor ?? Colors.grey,
             ),
           ),
         ],
@@ -41,10 +40,14 @@ class ScannerResultCard extends StatelessWidget {
     final latencyText = host.latencyMs != null ? '${host.latencyMs} ms' : 'N/A';
     final reachabilityText = host.isReachable ? 'Reachable' : 'Unreachable';
     final reachabilityColor =
-        host.isReachable ? Colors.green[900] : Colors.red[900];
+        host.isReachable ? Colors.green.shade700 : Colors.red.shade700;
 
-    return GenericCard(
-      color: Colors.grey.shade50,
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      elevation: 4,
+      shadowColor: Colors.white.withValues(alpha: 0.5),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: Theme.of(context).cardColor,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -54,13 +57,12 @@ class ScannerResultCard extends StatelessWidget {
               host.ip,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                letterSpacing: 0.25,
-                color: Colors.black87,
+                color: Colors.white,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             GridView(
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
@@ -79,12 +81,12 @@ class ScannerResultCard extends StatelessWidget {
                 _infoTile('Latency', latencyText, context),
               ].where((w) => w is! SizedBox).toList(),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
               'Open Ports',
-              style: theme.textTheme.bodyLarge?.copyWith(
+              style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 6),
@@ -97,14 +99,14 @@ class ScannerResultCard extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                      color: Colors.grey,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
                       port.port.toString(),
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: Colors.grey,
                       ),
                     ),
                   );
@@ -115,7 +117,7 @@ class ScannerResultCard extends StatelessWidget {
                 'No open ports found',
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontStyle: FontStyle.italic,
-                  color: Colors.black87,
+                  color: Colors.grey,
                 ),
               ),
           ],

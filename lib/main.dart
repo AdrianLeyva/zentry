@@ -3,7 +3,6 @@ import 'package:zentry/core/providers/environment_variables_provider.dart';
 import 'package:zentry/core/providers/logger_provider.dart';
 import 'package:zentry/core/theme/generic_theme.dart';
 import 'package:zentry/features/feature_navigator/feature_navigator_screen.dart';
-import 'package:zentry/modules/logger/logger.dart';
 
 Future<void> main() async {
   await EnvironmentVariablesProvider.instance.init();
