@@ -9,13 +9,13 @@ Zentry is an innovative mobile and desktop application focused on cybersecurity,
 -----
 
 #### Network Scanner
-![Network Scanner](assets/network_scanner.gif)
+<img src="assets/network_scanner.gif" alt="Network Scanner" width="400"/>
 
 #### Packet Sniffer
-![Packet Sniffer](assets/packet_sniffer.gif)
+<img src="assets/packet_sniffer.gif" alt="Packet Sniffer" width="400"/>
 
 #### AI Assistant
-![AI Assistant](assets/ai_assistant.gif)
+<img src="assets/ai_assistant.gif" alt="AI Assistant" width="400"/>
 
 -----
 
