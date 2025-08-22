@@ -84,9 +84,8 @@ class _PacketSnifferScreenState extends State<PacketSnifferScreen> {
                                       : Icons.radar,
                                   size: 20,
                                 ),
-                                label: Text(state.isSniffing
-                                    ? "Stop Sniffing"
-                                    : "Start Sniffing"),
+                                label:
+                                    Text(state.isSniffing ? "Stop" : "Start"),
                               ),
                               const SizedBox(width: 12),
                               if (!state.isSniffing && state.totalPackets > 0)
@@ -95,7 +94,7 @@ class _PacketSnifferScreenState extends State<PacketSnifferScreen> {
                                       bloc.add(AnalyzeWithAiEvent()),
                                   icon: const Icon(Icons.smart_toy,
                                       size: 20, color: Colors.black87),
-                                  label: const Text("Analyze with AI"),
+                                  label: const Text("AI analyze"),
                                 ),
                             ],
                           ),

@@ -56,7 +56,7 @@ class NetworkScannerScreen extends StatelessWidget {
                                       size: 20, color: Colors.black87),
                                   label: Text(state.isScanning
                                       ? "Scanning..."
-                                      : "Start Scan"),
+                                      : "Start"),
                                 ),
                               ),
                               const SizedBox(width: 16),
@@ -68,7 +68,7 @@ class NetworkScannerScreen extends StatelessWidget {
                                         bloc.add(AnalyzeWithAiEvent()),
                                     icon: const Icon(Icons.smart_toy,
                                         size: 20, color: Colors.black87),
-                                    label: const Text("Analyze with AI"),
+                                    label: const Text("AI analyze"),
                                   ),
                                 ),
                             ],

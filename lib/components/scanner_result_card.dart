@@ -106,7 +106,7 @@ class ScannerResultCard extends StatelessWidget {
                       port.port.toString(),
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey,
+                        color: Colors.black87,
                       ),
                     ),
                   );
