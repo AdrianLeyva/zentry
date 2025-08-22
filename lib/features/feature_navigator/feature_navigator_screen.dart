@@ -18,7 +18,23 @@ class FeatureNavigatorScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 24),
-              const Center(child: ZentryAnimation(size: 150)),
+              Center(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    const ZentryAnimation(size: 180),
+                    Transform.translate(
+                      offset: const Offset(0, 80),
+                      child: Image.asset(
+                        'assets/logo.png',
+                        width: 240,
+                        height: 240,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 24),
               Expanded(
                 child: BlocBuilder<FeatureNavigatorBloc, FeatureNavigatorState>(

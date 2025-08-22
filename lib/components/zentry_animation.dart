@@ -58,7 +58,6 @@ class _ZentryPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-
     final double maxRadius = size.width * 0.4;
 
     final corePaint = Paint()
@@ -94,34 +93,6 @@ class _ZentryPainter extends CustomPainter {
       ..maskFilter = MaskFilter.blur(BlurStyle.normal, 8 * glowValue);
 
     canvas.drawCircle(center, maxRadius * 0.25, coreCenterPaint);
-
-    final text = 'Zentry';
-    final textStyle = TextStyle(
-      fontSize: size.width * 0.38,
-      fontWeight: FontWeight.w900,
-      color: const Color(0xFF282614),
-      shadows: [
-        Shadow(
-          color: Colors.amber.withValues(alpha: 0.9),
-          blurRadius: 12,
-          offset: Offset(0, 0),
-        ),
-      ],
-    );
-
-    final textPainter = TextPainter(
-      text: TextSpan(text: text, style: textStyle),
-      textDirection: TextDirection.ltr,
-    );
-
-    textPainter.layout();
-
-    final offset = Offset(
-      center.dx - textPainter.width / 2,
-      center.dy - textPainter.height / 2,
-    );
-
-    textPainter.paint(canvas, offset);
   }
 
   @override
