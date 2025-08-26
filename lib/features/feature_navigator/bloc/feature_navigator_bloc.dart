@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zentry/features/ai_assistant/ai_assistant_screen.dart';
@@ -24,12 +26,13 @@ class FeatureNavigatorBloc
         icon: Icons.network_check,
         screenBuilder: () => const NetworkScannerScreen(),
       ),
-      FeatureItemUi(
-        title: "Packet Sniffer",
-        description: "Monitor incoming and outgoing packets (Android only).",
-        icon: Icons.shield,
-        screenBuilder: () => PacketSnifferScreen(),
-      ),
+      if (Platform.isAndroid)
+        FeatureItemUi(
+          title: "Packet Sniffer",
+          description: "Monitor incoming and outgoing packets (Android only).",
+          icon: Icons.shield,
+          screenBuilder: () => PacketSnifferScreen(),
+        ),
       FeatureItemUi(
         title: "AI Assistant",
         description: "Chat and interact with an AI assistant in real time.",
