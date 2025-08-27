@@ -4,7 +4,7 @@
 
 **AI-Powered Local Network Scanner – Flutter App**
 
-Zentry is an innovative mobile and desktop application focused on cybersecurity, developed with Flutter. It allows users to scan and evaluate their local networks with AI-powered intelligent analysis.
+Zentry is an innovative mobile application focused on cybersecurity, developed with Flutter. It allows users to scan and evaluate their local networks with AI-powered intelligent analysis.
 
 -----
 
