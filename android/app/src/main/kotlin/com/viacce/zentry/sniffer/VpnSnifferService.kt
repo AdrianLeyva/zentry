@@ -18,14 +18,6 @@ import android.system.StructPollfd
 
 class VpnSnifferService : VpnService() {
 
-    companion object {
-        var eventSink: EventChannel.EventSink? = null
-        const val ACTION_START = "com.viacce.zentry.sniffer.ACTION_START"
-        const val ACTION_STOP = "com.viacce.zentry.sniffer.ACTION_STOP"
-        const val CHANNEL_ID = "netscope_vpn_sniffer"
-        const val NOTIF_ID = 1001
-    }
-
     private var vpnInterface: ParcelFileDescriptor? = null
     private var inputStream: ParcelFileDescriptor.AutoCloseInputStream? = null
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -38,17 +30,17 @@ class VpnSnifferService : VpnService() {
     }
 
     override fun onStartCommand(intent: android.content.Intent?, flags: Int, startId: Int): Int {
-        when (intent?.action) {
+        return when (intent?.action) {
             ACTION_STOP -> {
                 stopVpn()
                 stopForeground(true)
                 stopSelf()
-                return START_NOT_STICKY
+                START_NOT_STICKY
             }
             else -> {
                 startForeground(NOTIF_ID, buildNotification())
                 startVpn()
-                return START_STICKY
+                START_STICKY
             }
         }
     }
@@ -70,19 +62,19 @@ class VpnSnifferService : VpnService() {
         isRunning = true
         Log.d("VpnSnifferService", "VPN started")
         val builder = Builder()
-        builder.addAddress("10.0.0.2", 32)
-        builder.addRoute("0.0.0.0", 0)
+        builder.addAddress(VPN_ADDRESS, VPN_PREFIX_LENGTH)
+        builder.addRoute(ROUTE_ADDRESS, ROUTE_PREFIX_LENGTH)
         vpnInterface = builder.setSession("NetScopeSniffer").establish()
         vpnInterface?.let { pfd ->
             inputStream = ParcelFileDescriptor.AutoCloseInputStream(pfd)
             job = serviceScope.launch {
-                val packetBuffer = ByteArray(32767)
+                val packetBuffer = ByteArray(PACKET_BUFFER_SIZE)
                 val pollFd = StructPollfd().apply {
                     fd = pfd.fileDescriptor
                     events = OsConstants.POLLIN.toShort()
                 }
                 while (isActive && isRunning) {
-                    val ready = try { Os.poll(arrayOf(pollFd), 250) } catch (_: Exception) { 0 }
+                    val ready = try { Os.poll(arrayOf(pollFd), POLL_TIMEOUT_MS) } catch (_: Exception) { 0 }
                     if (!isRunning || !isActive) break
                     if (ready > 0 && (pollFd.revents.toInt() and OsConstants.POLLIN) != 0) {
                         val length = try { inputStream?.read(packetBuffer) ?: -1 } catch (_: Exception) { -1 }
@@ -126,15 +118,15 @@ class VpnSnifferService : VpnService() {
 
     private fun buildNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("NetScope activo")
-            .setContentText("Analizando tráfico")
+            .setContentTitle("NetScope activated")
+            .setContentText("Analyzing traffic")
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
             .setOngoing(true)
             .build()
     }
 
     private fun parsePacket(buffer: ByteArray, length: Int): String? {
-        if (length < 20) return null
+        if (length < IPV4_HEADER_MIN_LENGTH) return null
         val version = (buffer[0].toInt() shr 4) and 0xF
         if (version != 4) return null
         val ihl = (buffer[0].toInt() and 0xF) * 4
@@ -145,25 +137,24 @@ class VpnSnifferService : VpnService() {
         val dstIp = InetAddress.getByAddress(buffer.copyOfRange(16, 20)).hostAddress
         var srcPort = 0
         var dstPort = 0
-        var protocolName = "other"
+        var protocolName = PROTOCOL_OTHER
         when (protocol) {
-            6 -> {
-                if (length < ihl + 20) return null
+            PROTOCOL_TCP -> {
+                if (length < ihl + TCP_HEADER_MIN_LENGTH) return null
                 srcPort = ((buffer[ihl].toInt() and 0xFF) shl 8) or (buffer[ihl + 1].toInt() and 0xFF)
                 dstPort = ((buffer[ihl + 2].toInt() and 0xFF) shl 8) or (buffer[ihl + 3].toInt() and 0xFF)
-                protocolName = "tcp"
+                protocolName = PROTOCOL_TCP_NAME
             }
-            17 -> {
-                if (length < ihl + 8) return null
+            PROTOCOL_UDP -> {
+                if (length < ihl + UDP_HEADER_MIN_LENGTH) return null
                 srcPort = ((buffer[ihl].toInt() and 0xFF) shl 8) or (buffer[ihl + 1].toInt() and 0xFF)
                 dstPort = ((buffer[ihl + 2].toInt() and 0xFF) shl 8) or (buffer[ihl + 3].toInt() and 0xFF)
-                protocolName = "udp"
+                protocolName = PROTOCOL_UDP_NAME
             }
-            1 -> protocolName = "icmp"
+            PROTOCOL_ICMP -> protocolName = PROTOCOL_ICMP_NAME
         }
         val timestampIso = java.time.Instant.ofEpochMilli(System.currentTimeMillis()).toString()
-        val maxRawBytes = 50
-        val rawBytes = buffer.copyOfRange(0, length.coerceAtMost(maxRawBytes))
+        val rawBytes = buffer.copyOfRange(0, length.coerceAtMost(MAX_RAW_BYTES))
         val rawHex = rawBytes.joinToString("") { "%02x".format(it) }
         return """
         {
@@ -177,5 +168,30 @@ class VpnSnifferService : VpnService() {
           "raw":"$rawHex"
         }
         """.trimIndent()
+    }
+
+    companion object {
+        var eventSink: EventChannel.EventSink? = null
+        const val ACTION_START = "com.viacce.zentry.sniffer.ACTION_START"
+        const val ACTION_STOP = "com.viacce.zentry.sniffer.ACTION_STOP"
+        const val CHANNEL_ID = "netscope_vpn_sniffer"
+        const val NOTIF_ID = 1001
+        private const val VPN_ADDRESS = "10.0.0.2"
+        private const val VPN_PREFIX_LENGTH = 32
+        private const val ROUTE_ADDRESS = "0.0.0.0"
+        private const val ROUTE_PREFIX_LENGTH = 0
+        private const val PACKET_BUFFER_SIZE = 32767
+        private const val POLL_TIMEOUT_MS = 250
+        private const val IPV4_HEADER_MIN_LENGTH = 20
+        private const val TCP_HEADER_MIN_LENGTH = 20
+        private const val UDP_HEADER_MIN_LENGTH = 8
+        private const val MAX_RAW_BYTES = 50
+        private const val PROTOCOL_TCP = 6
+        private const val PROTOCOL_UDP = 17
+        private const val PROTOCOL_ICMP = 1
+        private const val PROTOCOL_TCP_NAME = "tcp"
+        private const val PROTOCOL_UDP_NAME = "udp"
+        private const val PROTOCOL_ICMP_NAME = "icmp"
+        private const val PROTOCOL_OTHER = "other"
     }
 }

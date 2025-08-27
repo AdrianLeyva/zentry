@@ -40,15 +40,16 @@ class _PacketSnifferScreenState extends State<PacketSnifferScreen> {
       create: (_) => PacketSnifferBloc(),
       child: BlocConsumer<PacketSnifferBloc, PacketSnifferState>(
         listener: (context, state) {
+          final bloc = context.read<PacketSnifferBloc>();
           if (state.aiAnalysisResult != null) {
             showDialog(
               context: context,
               builder: (_) => GenericTextDialog(
-                title: 'AI Analysis Result',
-                mainText: state.aiAnalysisResult!,
-                jsonData: state.aiAnalysisMetadata,
-                closeButtonText: 'Close',
-              ),
+                  title: 'AI Analysis Result',
+                  mainText: state.aiAnalysisResult!,
+                  jsonData: state.aiAnalysisMetadata,
+                  closeButtonText: 'Close',
+                  onClose: () => bloc.add(ClearAiAnalysisEvent())),
             );
           }
           if (state.packets.isNotEmpty) {

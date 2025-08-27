@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
+import 'package:zentry/modules/logger/logger.dart';
 
 class NetworkUtils {
   static Future<String?> getLocalIp() async {
@@ -19,7 +19,7 @@ class NetworkUtils {
         }
       }
     } catch (e) {
-      debugPrint('Error retrieving local IP: $e');
+      Logger.debug('Error retrieving local IP: $e');
     }
     return null;
   }

@@ -35,8 +35,8 @@ class PacketSnifferState extends Equatable {
         packets: packets ?? this.packets,
         totalPackets: totalPackets ?? this.totalPackets,
         isAnalyzingWithAi: isAnalyzingWithAi ?? this.isAnalyzingWithAi,
-        aiAnalysisResult: aiAnalysisResult ?? this.aiAnalysisResult,
-        aiAnalysisMetadata: aiAnalysisMetadata ?? this.aiAnalysisMetadata);
+        aiAnalysisResult: aiAnalysisResult,
+        aiAnalysisMetadata: aiAnalysisMetadata);
   }
 
   @override

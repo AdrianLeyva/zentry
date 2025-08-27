@@ -31,6 +31,7 @@ class PacketSnifferBloc extends Bloc<PacketSnifferEvent, PacketSnifferState> {
     on<StopSniffingEvent>(_onStop);
     on<PacketCapturedEvent>(_onPacketCaptured);
     on<AnalyzeWithAiEvent>(_onAnalyzeWithAi);
+    on<ClearAiAnalysisEvent>(_onClearAiAnalysisData);
   }
 
   static bool _checkAvailability() {
@@ -84,6 +85,11 @@ class PacketSnifferBloc extends Bloc<PacketSnifferEvent, PacketSnifferState> {
       aiAnalysisResult: aiResponse.text,
       aiAnalysisMetadata: aiResponse.metadata,
     ));
+  }
+
+  Future<void> _onClearAiAnalysisData(
+      ClearAiAnalysisEvent event, Emitter<PacketSnifferState> emit) async {
+    emit(state.copyWith(aiAnalysisResult: null, aiAnalysisMetadata: null));
   }
 
   @override

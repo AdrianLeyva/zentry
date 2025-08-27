@@ -8,14 +8,15 @@ class GenericTextDialog extends StatelessWidget {
   final String mainText;
   final Map<String, dynamic>? jsonData;
   final String closeButtonText;
+  final VoidCallback? onClose;
 
-  const GenericTextDialog({
-    super.key,
-    required this.title,
-    required this.mainText,
-    this.jsonData,
-    this.closeButtonText = 'Close',
-  });
+  const GenericTextDialog(
+      {super.key,
+      required this.title,
+      required this.mainText,
+      this.jsonData,
+      this.closeButtonText = 'Close',
+      this.onClose});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +54,10 @@ class GenericTextDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            Navigator.of(context).pop();
+            onClose?.call();
+          },
           child: Text(closeButtonText),
         ),
       ],

@@ -20,3 +20,5 @@ class PacketCapturedEvent extends PacketSnifferEvent {
 }
 
 class AnalyzeWithAiEvent extends PacketSnifferEvent {}
+
+class ClearAiAnalysisEvent extends PacketSnifferEvent {}
